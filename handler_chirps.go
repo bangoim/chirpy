@@ -55,6 +55,27 @@ func (cfg *apiConfig) handlerCreateChirp(w http.ResponseWriter, r *http.Request)
 	})
 }
 
+func (cfg *apiConfig) handlerGetAllChirps(w http.ResponseWriter, r *http.Request) {
+	dbChirps, err := cfg.db.GetAllChirps(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "failed to get chirps")
+		return
+	}
+
+	chirps := make([]Chirp, len(dbChirps))
+	for i, dbChirp := range dbChirps {
+		chirps[i] = Chirp{
+			ID:        dbChirp.ID,
+			CreatedAt: dbChirp.CreatedAt,
+			UpdatedAt: dbChirp.UpdatedAt,
+			Body:      dbChirp.Body,
+			UserID:    dbChirp.UserID,
+		}
+	}
+
+	respondWithJSON(w, http.StatusOK, chirps)
+}
+
 func cleanProfanity(body string) string {
 	profaneWords := map[string]bool{
 		"kerfuffle": true,
