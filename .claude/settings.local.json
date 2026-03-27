@@ -7,7 +7,9 @@
       "Bash(git reset:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(sqlc generate:*)"
+      "Bash(sqlc generate:*)",
+      "Bash(goose:*)",
+      "Bash(go build:*)"
     ]
   }
 }
