@@ -4,10 +4,17 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/bangoim/chirpy/internal/auth"
 	"github.com/google/uuid"
 )
 
 func (cfg *apiConfig) handlerWebhook(w http.ResponseWriter, r *http.Request) {
+	apiKey, err := auth.GetAPIKey(r.Header)
+	if err != nil || apiKey != cfg.polkaKey {
+		respondWithError(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
 	type request struct {
 		Event string `json:"event"`
 		Data  struct {
@@ -26,7 +33,7 @@ func (cfg *apiConfig) handlerWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := cfg.db.UpgradeUserToChirpyRed(r.Context(), req.Data.UserID)
+	err = cfg.db.UpgradeUserToChirpyRed(r.Context(), req.Data.UserID)
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, "user not found")
 		return
